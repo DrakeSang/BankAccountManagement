@@ -1,0 +1,20 @@
+# Local environment configuration.
+# This profile is used when the backend connects to the local MySQL server.
+# Local MySQL usually runs on localhost:3306 and can be inspected through MySQL Workbench.
+
+spring:
+  datasource:
+    # JDBC connection URL for the local MySQL database.
+    # localhost:3306 means we connect to the MySQL server installed locally on the laptop.
+    # bank_account_db is the database/schema name.
+    url: jdbc:mysql://localhost:3306/bank_account_db
+    # Username for the local MySQL database.
+    # Replace this with your real local MySQL username.
+    username: ${LOCAL_DB_PASSWORD:your_local_mysql_username}
+    # Password for the local MySQL database.
+    # Replace this with your real local MySQL password.
+    # Be careful before committing a real password to GitHub.
+    password: ${LOCAL_DB_PASSWORD:your_local_mysql_password}
+    # MySQL JDBC driver class.
+    # This driver comes from the mysql-connector-j dependency.
+    driver-class-name: com.mysql.cj.jdbc.Driver

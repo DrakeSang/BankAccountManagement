@@ -1,0 +1,43 @@
+# Main Spring Boot configuration file.
+# This file contains settings that are common for all environments.
+# Environment-specific database settings are placed in:
+# - application-local.yml  -> local MySQL on port 3306
+# - application-docker.yml -> Docker MySQL on port 3307
+
+spring:
+  # Application name used by Spring Boot.
+  # It can appear in logs and monitoring tools.
+  application:
+    name: bank-account-management
+
+  # JPA/Hibernate configuration.
+  # Hibernate is used only as ORM here.
+  # Flyway is responsible for creating and updating the database schema.
+  jpa:
+    # validate means:
+    # - Hibernate will NOT create or update tables.
+    # - Hibernate will only check if the database schema matches the entity mappings.
+    # This is the recommended setup when using Flyway migrations.
+    hibernate:
+      ddl-auto: validate
+
+    # Prints generated SQL statements in the console.
+    # Useful during development to see what Hibernate executes.
+    show-sql: true
+    properties:
+      hibernate:
+        # Formats SQL in the console output to make it easier to read.
+        format_sql: true
+
+  # Flyway configuration.
+  # Flyway executes SQL migration files from src/main/resources/db/migration.
+  flyway:
+    enabled: true
+    # Location where Flyway looks for migration scripts.
+    # Example: V1__create_accounts_and_transfers_tables.sql
+    locations: classpath:db/migration
+
+# Backend server configuration.
+server:
+  # The Spring Boot application will run on http://localhost:8080.
+  port: 8080

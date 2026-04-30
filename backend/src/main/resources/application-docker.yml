@@ -1,0 +1,17 @@
+# Docker environment configuration.
+# This profile is used when the backend connects to MySQL running inside Docker.
+# The Docker container internally uses port 3306,
+# but it is exposed to the laptop as localhost:3307 to avoid conflict with local MySQL.
+
+spring:
+  datasource:
+    # JDBC connection URL for Docker MySQL.
+    # localhost:3307 is the host port mapped to the container's internal MySQL port 3306.
+    # This allows local MySQL to keep using 3306 without conflict.
+    url: jdbc:mysql://localhost:3307/bank_account_db
+    # Username defined in docker-compose.yml through MYSQL_USER.
+    username: bank_user
+    # Password defined in docker-compose.yml through MYSQL_PASSWORD.
+    password: bank_password
+    # MySQL JDBC driver class.
+    driver-class-name: com.mysql.cj.jdbc.Driver

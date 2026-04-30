@@ -1,0 +1,39 @@
+# Docker Compose file for running the database locally in a container.
+# This makes the project easier to run on another machine without installing MySQL manually.
+
+services:
+  # Service name inside Docker Compose.
+  # Other containers could refer to this database as "mysql".
+  mysql:
+    # MySQL Docker image version.
+    # MySQL 8.4 is a stable modern MySQL version.
+    image: mysql:8.4
+    # Container name shown in Docker Desktop and used in docker exec commands.
+    container_name: bank-account-mysql
+    # Restart policy.
+    # The container will be restarted automatically unless it is manually stopped.
+    restart: unless-stopped
+    # Environment variables used by the MySQL image during first startup.
+    environment:
+      # Database/schema that will be created automatically inside the container.
+      MYSQL_DATABASE: bank_account_db
+      # Non-root user created automatically by the MySQL image.
+      MYSQL_USER: bank_user
+      # Password for MYSQL_USER.
+      MYSQL_PASSWORD: bank_password
+      # Required root password for the MySQL root user inside the container.
+      MYSQL_ROOT_PASSWORD: root_password
+    # Port mapping format is HOST_PORT:CONTAINER_PORT.
+    # MySQL inside the container listens on 3306.
+    # We expose it on localhost:3307 to avoid conflict with local MySQL on 3306.
+    ports:
+      - "3307:3306"
+    # Persistent volume for MySQL data.
+    # Without this, data would be lost when the container is removed.
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+# Named Docker volume used by the MySQL service.
+# It stores database files outside the container lifecycle.
+volumes:
+  mysql_data:
