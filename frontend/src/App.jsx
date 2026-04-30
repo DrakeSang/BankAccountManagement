@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import { accountApi } from './api/accountApi';
-import AlertMessage from './components/AlertMessage';
-import AccountForm from './components/AccountForm';
-import AccountTable from './components/AccountTable';
+import AlertMessage from './components/common/AlertMessage.jsx';
+import AccountForm from './components/accounts/AccountForm.jsx';
+import AccountTable from './components/accounts/AccountTable.jsx';
+import TransferSection from "./components/transfers/TransferSection";
 
 /**
  * App is the main component for the account management page.
@@ -323,6 +324,13 @@ function App() {
             onFreezeAccount={handleFreezeAccount}
             onUnfreezeAccount={handleUnfreezeAccount}
             isLoading={loading}
+        />
+
+        <TransferSection
+            accounts={accounts}
+            refreshAccounts={loadAccounts}
+            setError={setError}
+            setSuccessMessage={setSuccessMessage}
         />
       </div>
   );
