@@ -9,6 +9,7 @@ import com.emilyordanov.bankaccountmanagement.common.exception.ResourceNotFoundE
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.regex.Pattern;
 
 import java.util.List;
 
@@ -27,12 +28,18 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
+    private static final int MIN_IBAN_LENGTH = 15;
+    private static final int MAX_IBAN_LENGTH = 34;
+    private static final int BULGARIAN_IBAN_LENGTH = 22;
+
+    private static final Pattern BASIC_IBAN_PATTERN = Pattern.compile("^[A-Z]{2}\\d{2}[A-Z0-9]+$");
+
     private final AccountRepository accountRepository;
 
     /**
      * Returns all accounts.
      *
-     * @Transactional(readOnly = true) is used because this method only reads data.
+     * @Transactional (readOnly = true) is used because this method only reads data.
      * It can help performance and makes the intention clear.
      */
     @Transactional(readOnly = true)
@@ -70,7 +77,7 @@ public class AccountService {
     @Transactional
     public AccountResponse createAccount(AccountCreateRequest request) {
         String name = normalizeName(request.name());
-        String iban = normalizeIban(request.iban());
+        String iban = normalizeAndValidateIban(request.iban());
 
         validateUniqueName(name);
         validateUniqueIban(iban);
@@ -110,7 +117,7 @@ public class AccountService {
         Account account = findAccountById(id);
 
         String name = normalizeName(request.name());
-        String iban = normalizeIban(request.iban());
+        String iban = normalizeAndValidateIban(request.iban());
 
         validateUniqueNameForUpdate(name, id);
         validateUniqueIbanForUpdate(iban, id);
@@ -246,6 +253,19 @@ public class AccountService {
     }
 
     /**
+     * Normalizes and validates IBAN before saving.
+     *
+     * First we remove spaces and convert to uppercase.
+     * Then we validate the normalized value.
+     */
+    private String normalizeAndValidateIban(String iban) {
+        String normalizedIban = normalizeIban(iban);
+        validateIbanFormat(normalizedIban);
+
+        return normalizedIban;
+    }
+
+    /**
      * Normalizes IBAN before saving.
      *
      * Example:
@@ -257,6 +277,33 @@ public class AccountService {
      */
     private String normalizeIban(String iban) {
         return iban.replaceAll("\\s+", "").toUpperCase();
+    }
+
+    /**
+     * Basic IBAN validation.
+     *
+     * This is not a full IBAN checksum validation.
+     * Full IBAN validation would include the official mod-97 checksum algorithm.
+     *
+     * For this assignment, we validate:
+     * - length between 15 and 34 characters
+     * - starts with 2 country letters
+     * - followed by 2 check digits
+     * - contains only uppercase letters and digits after normalization
+     * - if it starts with BG, it must be exactly 22 characters
+     */
+    private void validateIbanFormat(String iban) {
+        if (iban.length() < MIN_IBAN_LENGTH || iban.length() > MAX_IBAN_LENGTH) {
+            throw new BadRequestException("IBAN must be between 15 and 34 characters");
+        }
+
+        if (!BASIC_IBAN_PATTERN.matcher(iban).matches()) {
+            throw new BadRequestException("IBAN format is invalid");
+        }
+
+        if (iban.startsWith("BG") && iban.length() != BULGARIAN_IBAN_LENGTH) {
+            throw new BadRequestException("Bulgarian IBAN must be exactly 22 characters");
+        }
     }
 
     /**

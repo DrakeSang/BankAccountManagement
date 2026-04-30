@@ -37,7 +37,7 @@ public record AccountCreateRequest(
          * More advanced IBAN format validation can be added later if needed.
          */
         @NotBlank(message = "IBAN is required")
-        @Size(max = 34, message = "IBAN must be at most 34 characters")
+        @Size(min = 15, max = 34, message = "IBAN must be between 15 and 34 characters")
         String iban,
 
         /**
