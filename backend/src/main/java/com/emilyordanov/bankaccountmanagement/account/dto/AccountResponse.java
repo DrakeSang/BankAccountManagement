@@ -7,9 +7,9 @@ import java.time.Instant;
 
 /**
  * Response DTO returned by the API.
- *
+ * <p>
  * This is what the frontend/client receives.
- *
+ * <p>
  * We return all important account information:
  * - id
  * - name
@@ -17,7 +17,7 @@ import java.time.Instant;
  * - status
  * - balance
  * - timestamps
- *
+ * <p>
  * Returning DTOs instead of entities keeps the API contract cleaner
  * and avoids exposing internal JPA details.
  */

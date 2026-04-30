@@ -5,10 +5,10 @@ import java.util.Map;
 
 /**
  * Standard error response returned by the API.
- *
+ * <p>
  * Instead of returning random error formats,
  * we return a consistent structure for all handled exceptions.
- *
+ * <p>
  * validationErrors is used only for field validation errors.
  * For normal business errors it is null.
  */
@@ -21,14 +21,14 @@ public record ErrorResponse(
 ) {
     /**
      * Factory method for normal errors.
-     *
+     * <p>
      * Example:
      * {
-     *   "timestamp": "...",
-     *   "status": 404,
-     *   "error": "Not Found",
-     *   "message": "Account with id 99 was not found",
-     *   "validationErrors": null
+     * "timestamp": "...",
+     * "status": 404,
+     * "error": "Not Found",
+     * "message": "Account with id 99 was not found",
+     * "validationErrors": null
      * }
      */
     public static ErrorResponse of(int status, String error, String message) {
@@ -43,17 +43,17 @@ public record ErrorResponse(
 
     /**
      * Factory method for validation errors.
-     *
+     * <p>
      * Example:
      * {
-     *   "timestamp": "...",
-     *   "status": 400,
-     *   "error": "Bad Request",
-     *   "message": "Validation failed",
-     *   "validationErrors": {
-     *     "name": "Account name is required",
-     *     "availableAmount": "Available amount cannot be negative"
-     *   }
+     * "timestamp": "...",
+     * "status": 400,
+     * "error": "Bad Request",
+     * "message": "Validation failed",
+     * "validationErrors": {
+     * "name": "Account name is required",
+     * "availableAmount": "Available amount cannot be negative"
+     * }
      * }
      */
     public static ErrorResponse ofValidationErrors(

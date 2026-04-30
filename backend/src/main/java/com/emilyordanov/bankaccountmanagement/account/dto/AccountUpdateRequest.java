@@ -6,18 +6,18 @@ import java.math.BigDecimal;
 
 /**
  * Request DTO used when updating an existing account.
- *
+ * <p>
  * We allow updating:
  * - name
  * - IBAN
  * - availableAmount
- *
+ * <p>
  * We intentionally do not allow changing status here.
- *
+ * <p>
  * Status is changed only through dedicated business endpoints:
  * PATCH /api/accounts/{id}/freeze
  * PATCH /api/accounts/{id}/unfreeze
- *
+ * <p>
  * This makes the API clearer because freezing/unfreezing is a business action,
  * not just a generic field update.
  */

@@ -52,13 +52,16 @@ CREATE TABLE accounts
     created_on       DATETIME(6)    NOT NULL,
 
     -- Date and time when the account was last modified.
-    -- NULL is allowed because a newly created account may not have been modified yet.
-    modified_on      DATETIME(6)    NULL,
+    -- We keep it NOT NULL because @PrePersist sets both created_on and modified_on
+    -- when the entity is first saved.
+    modified_on      DATETIME(6)    NOT NULL,
 
     -- Account name must be unique according to the assignment.
+    -- MySQL creates an index internally for UNIQUE constraints.
     CONSTRAINT uk_accounts_name UNIQUE (name),
 
     -- IBAN must be unique according to the assignment.
+    -- MySQL creates an index internally for UNIQUE constraints.
     CONSTRAINT uk_accounts_iban UNIQUE (iban),
 
     -- Available amount should never be negative.
@@ -71,10 +74,31 @@ CREATE TABLE transfers
     -- Primary key of the transfer record.
     id                     BIGINT AUTO_INCREMENT PRIMARY KEY,
 
+    -- Reference ID connects the two records of one logical transfer.
+    --
+    -- Example:
+    -- User transfers 100 from Account A to Account B.
+    --
+    -- The application creates:
+    -- 1. DEBIT record for Account A
+    -- 2. CREDIT record for Account B
+    --
+    -- Both records will have the same reference_id.
+    --
+    -- This helps us:
+    -- - group the debit and credit side of the same operation
+    -- - trace the full transfer
+    -- - return or debug both sides of the operation
+    -- - keep account transfer history simple with WHERE account_id = ?
+    --
+    -- VARCHAR(36) is used because UUID string representation has 36 characters.
+    -- VARCHAR is also a natural match for Java String when Hibernate validates the schema.
+    reference_id           VARCHAR(36)    NOT NULL,
+
     -- The account for which this transfer record is created.
     --
     -- Important:
-    -- We plan to create two records for one logical bank transfer:
+    -- We create two records for one logical bank transfer:
     -- 1. DEBIT record for the source account
     -- 2. CREDIT record for the beneficiary account
     --
@@ -106,32 +130,13 @@ CREATE TABLE transfers
     -- The amount must be positive.
     amount                 DECIMAL(19, 2) NOT NULL,
 
-    -- Reference ID connects the two records of one logical transfer.
-    --
-    -- Example:
-    -- User transfers 100 from Account A to Account B.
-    --
-    -- The application creates:
-    -- 1. DEBIT record for Account A
-    -- 2. CREDIT record for Account B
-    --
-    -- Both records will have the same reference_id.
-    --
-    -- This helps us:
-    -- - group the debit and credit side of the same operation
-    -- - trace the full transfer
-    -- - return or debug both sides of the operation
-    -- - keep account transfer history simple with WHERE account_id = ?
-    --
-    -- CHAR(36) is used because UUID string representation has 36 characters.
-    reference_id           CHAR(36)       NOT NULL,
-
     -- Date and time when the transfer record was created.
     created_on             DATETIME(6)    NOT NULL,
 
     -- Date and time when the transfer record was last modified.
     -- Usually transfers will not be modified, but the column is included because it is required by the assignment.
-    modified_on            DATETIME(6)    NULL,
+    -- We keep it NOT NULL because @PrePersist sets both created_on and modified_on.
+    modified_on            DATETIME(6)    NOT NULL,
 
     -- Foreign key from transfers.account_id to accounts.id.
     -- This guarantees that every transfer record belongs to an existing account.
@@ -150,6 +155,11 @@ CREATE TABLE transfers
     -- This supports the user story:
     -- "As a user, you should be able to see a list of all transfers for certain account."
     INDEX idx_transfers_account_id (account_id),
+
+    -- Index for faster lookup by the opposite/counterparty account.
+    -- This is useful if later we want to search transfers where a given account was the other side of the operation.
+    -- It also matches the @Index definition in the Transfer entity.
+    INDEX idx_transfers_beneficiary_account_id (beneficiary_account_id),
 
     -- Index for faster lookup by reference_id.
     -- Useful if we want to find both DEBIT and CREDIT records of the same logical transfer.

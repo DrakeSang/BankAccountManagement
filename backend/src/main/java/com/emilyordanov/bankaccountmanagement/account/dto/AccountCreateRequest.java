@@ -6,13 +6,13 @@ import java.math.BigDecimal;
 
 /**
  * Request DTO used when creating a new account.
- *
+ * <p>
  * We use DTOs instead of exposing the entity directly through the API.
  * This gives us control over:
  * - what the client can send
  * - what fields are validated
  * - what fields are hidden from direct modification
- *
+ * <p>
  * For example:
  * The client does not send id, status, createdOn or modifiedOn.
  * The backend controls those fields.

@@ -2,11 +2,11 @@ package com.emilyordanov.bankaccountmanagement.common.exception;
 
 /**
  * Exception used when a requested resource does not exist.
- *
+ * <p>
  * Example:
  * GET /api/accounts/999
  * but account with id 999 does not exist.
- *
+ * <p>
  * GlobalExceptionHandler converts this exception to HTTP 404.
  */
 public class ResourceNotFoundException extends RuntimeException {

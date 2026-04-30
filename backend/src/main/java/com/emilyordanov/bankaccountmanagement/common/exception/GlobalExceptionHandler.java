@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @RestControllerAdvice allows us to handle exceptions from all controllers
  * in one central place.
- *
+ * <p>
  * Without this class, Spring Boot would return default error responses.
  * With this class, we return our own consistent ErrorResponse format.
  */
@@ -23,10 +23,10 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     /**
      * Handles cases when a resource is not found.
-     *
+     * <p>
      * Example:
      * Account with id 99 does not exist.
-     *
+     * <p>
      * Returns HTTP 404 Not Found.
      */
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -41,10 +41,10 @@ public class GlobalExceptionHandler {
 
     /**
      * Handles duplicate resource errors.
-     *
+     * <p>
      * Example:
      * User tries to create account with already existing IBAN.
-     *
+     * <p>
      * Returns HTTP 409 Conflict.
      */
     @ExceptionHandler(DuplicateResourceException.class)
@@ -59,10 +59,10 @@ public class GlobalExceptionHandler {
 
     /**
      * Handles business validation errors.
-     *
+     * <p>
      * Example:
      * User tries to freeze an already frozen account.
-     *
+     * <p>
      * Returns HTTP 400 Bad Request.
      */
     @ExceptionHandler(BadRequestException.class)
@@ -77,13 +77,13 @@ public class GlobalExceptionHandler {
 
     /**
      * Handles validation errors from @Valid request DTOs.
-     *
+     * <p>
      * MethodArgumentNotValidException is thrown when annotations such as:
      * - @NotBlank
      * - @NotNull
      * - @DecimalMin
      * - @Size
-     *
+     * <p>
      * fail during request body validation.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -112,10 +112,10 @@ public class GlobalExceptionHandler {
 
     /**
      * Fallback handler for unexpected errors.
-     *
+     * <p>
      * This prevents internal stack traces or technical details
      * from being returned directly to the client.
-     *
+     * <p>
      * In a real production application, we would also log the exception.
      */
     @ExceptionHandler(Exception.class)

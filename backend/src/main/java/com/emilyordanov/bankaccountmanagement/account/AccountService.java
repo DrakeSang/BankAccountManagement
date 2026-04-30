@@ -6,16 +6,15 @@ import com.emilyordanov.bankaccountmanagement.account.dto.AccountUpdateRequest;
 import com.emilyordanov.bankaccountmanagement.common.exception.BadRequestException;
 import com.emilyordanov.bankaccountmanagement.common.exception.DuplicateResourceException;
 import com.emilyordanov.bankaccountmanagement.common.exception.ResourceNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.regex.Pattern;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Service layer for account business logic.
- *
+ * <p>
  * The controller only receives HTTP requests and returns HTTP responses.
  * The service contains the actual business rules:
  * - create account
@@ -26,7 +25,6 @@ import java.util.List;
  * - normalize input data
  */
 @Service
-@RequiredArgsConstructor
 public class AccountService {
     private static final int MIN_IBAN_LENGTH = 15;
     private static final int MAX_IBAN_LENGTH = 34;
@@ -35,6 +33,10 @@ public class AccountService {
     private static final Pattern BASIC_IBAN_PATTERN = Pattern.compile("^[A-Z]{2}\\d{2}[A-Z0-9]+$");
 
     private final AccountRepository accountRepository;
+
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
 
     /**
      * Returns all accounts.
@@ -52,7 +54,7 @@ public class AccountService {
 
     /**
      * Returns one account by id.
-     *
+     * <p>
      * If the account does not exist, we throw ResourceNotFoundException.
      * The GlobalExceptionHandler converts it to HTTP 404.
      */
@@ -64,13 +66,13 @@ public class AccountService {
 
     /**
      * Creates a new bank account.
-     *
+     * <p>
      * Rules:
      * - name must be unique
      * - IBAN must be unique
      * - initial amount cannot be negative
      * - new accounts are ACTIVE by default
-     *
+     * <p>
      * Validation annotations in AccountCreateRequest handle basic validation.
      * This service handles business validation such as uniqueness.
      */
@@ -102,13 +104,13 @@ public class AccountService {
 
     /**
      * Updates an existing account.
-     *
+     * <p>
      * Rules:
      * - account must exist
      * - new name must not be used by another account
      * - new IBAN must not be used by another account
      * - availableAmount cannot be negative
-     *
+     * <p>
      * Status is not updated here.
      * Status changes are handled by freeze/unfreeze endpoints.
      */
@@ -146,7 +148,7 @@ public class AccountService {
 
     /**
      * Freezes an account.
-     *
+     * <p>
      * Frozen accounts should not be allowed to participate in transfers.
      * We will enforce that later in TransferService.
      */
@@ -171,7 +173,7 @@ public class AccountService {
 
     /**
      * Unfreezes an account.
-     *
+     * <p>
      * After this operation the account becomes ACTIVE again.
      */
     @Transactional
@@ -191,7 +193,7 @@ public class AccountService {
 
     /**
      * Helper method for loading an account or throwing a clear exception.
-     *
+     * <p>
      * This avoids repeating the same findById().orElseThrow(...) logic
      * in multiple service methods.
      */
@@ -220,7 +222,7 @@ public class AccountService {
 
     /**
      * Validates name uniqueness during update.
-     *
+     * <p>
      * We exclude the current account id from the check.
      * This allows the account to keep its own name.
      */
@@ -232,7 +234,7 @@ public class AccountService {
 
     /**
      * Validates IBAN uniqueness during update.
-     *
+     * <p>
      * We exclude the current account id from the check.
      * This allows the account to keep its own IBAN.
      */
@@ -244,7 +246,7 @@ public class AccountService {
 
     /**
      * Normalizes account name before saving.
-     *
+     * <p>
      * Example:
      * "  Main Account  " becomes "Main Account".
      */
@@ -254,7 +256,7 @@ public class AccountService {
 
     /**
      * Normalizes and validates IBAN before saving.
-     *
+     * <p>
      * First we remove spaces and convert to uppercase.
      * Then we validate the normalized value.
      */
@@ -267,12 +269,12 @@ public class AccountService {
 
     /**
      * Normalizes IBAN before saving.
-     *
+     * <p>
      * Example:
      * "bg18 rzbb 9155 0123 4567 89"
      * becomes:
      * "BG18RZBB91550123456789"
-     *
+     * <p>
      * This helps avoid duplicate IBANs written with different spacing or casing.
      */
     private String normalizeIban(String iban) {
@@ -281,10 +283,10 @@ public class AccountService {
 
     /**
      * Basic IBAN validation.
-     *
+     * <p>
      * This is not a full IBAN checksum validation.
      * Full IBAN validation would include the official mod-97 checksum algorithm.
-     *
+     * <p>
      * For this assignment, we validate:
      * - length between 15 and 34 characters
      * - starts with 2 country letters
@@ -308,7 +310,7 @@ public class AccountService {
 
     /**
      * Maps Account entity to AccountResponse DTO.
-     *
+     * <p>
      * This keeps mapping logic in one place.
      */
     private AccountResponse toResponse(Account account) {
