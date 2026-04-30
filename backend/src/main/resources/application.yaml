@@ -28,6 +28,29 @@ spring:
       hibernate:
         # Formats SQL in the console output to make it easier to read.
         format_sql: true
+        # Hibernate JDBC timezone configuration.
+        #
+        # In the entities we use Instant for createdOn and modifiedOn.
+        # Instant represents an exact moment in time in UTC, for example:
+        # 2026-04-30T12:45:10Z
+        #
+        # This is useful for audit fields such as createdOn, modifiedOn and transfer timestamps,
+        # because these fields answer the question: "When exactly did this happen?"
+        #
+        # LocalDateTime is different. It represents a date and time without timezone information,
+        # for example: 2026-04-30T15:45:10.
+        # It does not say whether this is Bulgarian time, UTC time, German time, etc.
+        #
+        # LocalDateTime is more suitable for local business concepts such as appointments,
+        # working hours or schedules.
+        #
+        # For this banking application, Instant is a better choice because account creation,
+        # account modification and transfers are exact events in time.
+        #
+        # Setting the JDBC timezone to UTC helps Hibernate store and read these timestamp values
+        # consistently through the JDBC driver.
+        jdbc:
+          time_zone: UTC
 
   # Flyway configuration.
   # Flyway executes SQL migration files from src/main/resources/db/migration.
