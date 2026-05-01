@@ -1,12 +1,13 @@
-body {
-  background-color: #f8f9fa;
+.alert-fade {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.card {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+.alert-fade.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.table td,
-.table th {
-  vertical-align: middle;
+.alert-fade.hide {
+  opacity: 0;
+  transform: translateY(-6px);
 }

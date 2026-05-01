@@ -98,6 +98,14 @@ function AccountForm({
      * - build request payload
      * - if selectedAccount exists -> update
      * - otherwise -> create
+     *
+     * Important UX behavior:
+     * - if create/update is successful, we reset the form
+     * - if backend returns validation/business error, we keep the user input
+     *
+     * This is why onCreateAccount/onUpdateAccount should return:
+     * - true  when operation succeeds
+     * - false when operation fails
      */
     async function handleSubmit(event) {
         event.preventDefault();
@@ -108,14 +116,31 @@ function AccountForm({
 
             // Backend expects BigDecimal.
             // JSON sends this as number.
-            // Backend validation still protects invalid values.
+            // If the field is empty, we send null so backend @NotNull validation can handle it.
             availableAmount: formData.availableAmount === '' ? null : Number(formData.availableAmount)
         };
 
+        let isSuccessful;
+
         if (selectedAccount) {
-            await onUpdateAccount(selectedAccount.id, payload);
+            isSuccessful = await onUpdateAccount(selectedAccount.id, payload);
         } else {
-            await onCreateAccount(payload);
+            isSuccessful = await onCreateAccount(payload);
+        }
+
+        /**
+         * Reset the form only after successful create/update.
+         *
+         * For create:
+         * - fields become empty again
+         * - placeholders are visible again
+         *
+         * For update:
+         * - App.jsx also clears selectedAccount
+         * - form returns to create mode
+         */
+        if (isSuccessful) {
+            setFormData(initialFormState);
         }
     }
 
